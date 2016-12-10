@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World</title>
+	<script src="browser.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="jquery.js"></script>
+	<style>
+		.message{
+			font-size: 20pt;
+		}
+	</style>
+	<script type="text/babel">
+		var Greeter = React.createClass({
+			getInitialState : function(){
+				var self = this;
+				return{
+					name : '',
+					message : '',
+					greet : function(){
+						console.log(this);
+						var greetMsg = 'Hi ' + this.name + '!';
+						self.setState({message : greetMsg});
+					}
+				}
+			},
+			triggerGreet : function(){
+				var name = this.refs.txtName.value;
+				this.state.name = name;
+				this.state.greet();
+			},
+			render : function(){
+				return (
+					<div>
+						<h1>Greeter</h1>
+						<label htmlFor="">Name :</label>
+						<input type="text" ref="txtName"/>
+						<input type="button" value="Greet" onClick={this.triggerGreet}/>
+						<div className="message">{this.state.message}</div>
+					</div>
+				)
+			}
+		})
+		$(function(){
+			ReactDOM.render(<Greeter></Greeter>, $("#content")[0])
+		})
+	</script>
+</head>
+<body>
+	<div id="content">
+		
+	</div>
+</body>
+</html>
