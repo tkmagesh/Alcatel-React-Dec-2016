@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		section{
+			margin-bottom: 10px;
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+			-webkit-padding-start: 0px;
+		}
+		li{
+			border : 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 5px;
+			border-radius: 5px;
+			margin-bottom: 10px;
+		}
+		.stats, .bugname{
+			font-size: 20pt;
+		}
+		.bugname{
+			cursor: pointer;
+		}
+		.closed{
+			color : red;
+			font-style: italic;
+			text-decoration: line-through;
+		}
+	</style>
+	<script src="browser.min.js"></script>
+	<script src="jquery.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script type="text/babel">
+		function BugsCollection(){
+			var bugs = [
+				'Server communication failure',
+				'User actions not recognized',
+				'Application is not responsive'
+			];
+			this.onChange = null;
+			var self = this;
+			function triggerChange(){
+				if (typeof self.onChange === 'function')
+					self.onChange();
+			}
+			this.add = function(bug){
+				bugs.push(bug);
+				//trigger change notification
+				triggerChange();
+			};
+
+			this.getData = function(){
+				return bugs.slice(0);
+			}
+		}
+		var bugsCollection = new BugsCollection();
+		var BugTracker = React.createClass({
+			render : function(){
+				var bugsData = this.props.bugs.getData();
+				var bugItems = bugsData.map(function(bugData){
+					return <li><span className="bugname">{bugData}</span></li>
+				});
+				return (
+					<div>
+						<section className="stats">
+							<span className="closed">2</span>
+							<span> / </span>
+							<span>{bugsData.length}</span>
+						</section>
+						<section className="list">
+							<label htmlFor="">Bug :</label>
+							<input type="text" name="" id="" />
+							<input type="button" value="Add Bug" />
+							<input type="button" value="Remove Closed" />
+							<ol>
+								{bugItems}
+							</ol>
+						</section>
+					</div>
+				);
+			}
+		})
+
+		function render(){
+			ReactDOM.render(<BugTracker bugs={bugsCollection}></BugTracker>, document.getElementById("content"))
+		}
+		bugsCollection.onChange = render;
+		$(function(){
+			render();
+		})
+
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="content"></div>
+</body>
+</html>
