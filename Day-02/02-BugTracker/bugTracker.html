@@ -36,12 +36,22 @@
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>
 	<script type="text/babel">
+		function Bug(id, name){
+			this.id = id;
+			this.name = name;
+			this.isClosed = false;
+			this.onChange = null;
+		}
+		Bug.prototype.toggle = function(){
+			this.isClosed = !this.isClosed;
+			if (typeof this.onChange === 'function')
+				this.onChange();
+		}
+
+
 		function BugsCollection(){
-			var bugs = [
-				{id : 1, name : 'Server communication failure', isClosed : false},
-				{id : 2, name : 'User actions not recognized', isClosed : true},
-				{id : 3, name : 'Application is not responsive', isClosed : false},
-			];
+			var bugs = [];
+			
 			this.onChange = null;
 			var self = this;
 			function triggerChange(){
@@ -49,13 +59,13 @@
 					self.onChange();
 			}
 			this.add = function(bugName){
-				var newBug = {
-					id : bugs.reduce(function(result, bug){
+				var newId = bugs.reduce(function(result, bug){
 						return result > bug.id ? result : bug.id;
-					}, 0)+1,
-					name : bugName,
-					isClosed : false
-				};
+					}, 0)+1;
+				var newBug = new Bug(newId, bugName);
+				
+				newBug.onChange = triggerChange;
+
 				bugs.push(newBug);
 				//trigger change notification
 				triggerChange();
@@ -81,6 +91,24 @@
 					</section>
 				);
 			}
+		});
+		var BugListItem = React.createClass({
+			onBugClick  : function(){
+				this.props.bug.toggle();
+				console.log(this.props.bug);
+			},
+			render : function(){
+				var bugData = this.props.bug;
+				var bugContent = bugData.isClosed 
+						? <span className="bugname closed" onClick={this.onBugClick}> {bugData.name} </span> 
+						: <span className="bugname" onClick={this.onBugClick}>{bugData.name} </span>;
+				return (
+
+						<li>
+							{bugContent}
+						</li>
+					)
+			}
 		})
 		var BugTracker = React.createClass({
 
@@ -94,16 +122,9 @@
 				var bugsData = this.props.bugs.getData();
 				
 				var bugItems = bugsData.map(function(bugData){
-					var bugContent = bugData.isClosed 
-						? <span className="bugname closed"> {bugData.name} </span> 
-						: <span className="bugname">{bugData.name} </span>;
-
-					return (
-						<li key={bugData.id}>
-							{bugContent}
-						</li>
-					)
+					return <BugListItem key={bugData.id} bug={bugData}></BugListItem>
 				});
+
 				return (
 					<div>
 						<BugStats bugs={this.props.bugs}></BugStats>
