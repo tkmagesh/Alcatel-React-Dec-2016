@@ -86,7 +86,7 @@
 				this.props.calculator.calculate();
 			},
 			updateBasic : function(evt){
-				this.props.calculator.set('basic', evt.target.value.toInt());
+				this.props.calculator.set('basic', this.refs.txtBasic.value.toInt());
 			},
 			updateHra : function(evt){
 				this.props.calculator.set('hra', evt.target.value.toInt());
@@ -103,7 +103,7 @@
 					<section className="content" id="content-1">
 						<div className="field">
 							<label htmlFor="">Basic :</label>
-							<input type="text" name="" ref="txtBasic" defaultValue={calculatorData.basic} onChange={this.updateBasic}/>
+							<input type="text" name="" ref="txtBasic" value={calculatorData.basic} onChange={this.updateBasic}/>
 						</div>
 						<div className="field">
 							<label htmlFor="">HRA :</label>
@@ -128,6 +128,22 @@
 				)
 			}
 		})
+
+		var EmpList = React.createClass({
+			render : function(){
+				var emps = ['Magesh', 'Suresh', 'Ganesh', 'Ramesh', 'Rajesh']
+				var items = emps.map(function(emp){
+					return (
+						<li>{emp}</li>
+					)
+				})
+				return (
+					<ol>
+						{items}
+					</ol>
+				)
+			}
+		})
 		$(document).ready(function(){
 			window.calculator = new SalaryCalculator();
 			calculator.set("basic", 20000);
@@ -136,11 +152,15 @@
 			calculator.set("tax", 10);
 
 			function renderView(){
-				ReactDOM.render(<SalaryCalculatorView calculator={calculator}></SalaryCalculatorView>, $("#content")[0]);
+				/* ReactDOM.render(<SalaryCalculatorView calculator={calculator}></SalaryCalculatorView>, $("#content")[0]); */
+
+				ReactDOM.render(<EmpList></EmpList>, $("#content")[0])
 			}
 			calculator.onChange("all", renderView);
 			renderView();
 		});
+
+
 	</script>
 </head>
 <body>
