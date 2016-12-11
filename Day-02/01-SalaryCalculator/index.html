@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>
+		.field{
+			margin-bottom: 10px;
+		}
+		label{
+			display: block;
+		}
+		#divResult{
+			color : red;
+			font-size: 20pt;
+		}
+	</style>
+	<script src="jquery.js"></script>
+	<script src="browser.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script type="text/babel">
+		String.prototype.toInt = function(){
+			return parseInt(this, 10);
+		}
+
+		//Model
+		function SalaryCalculator(){
+			//this.basic = 0;
+			var data = {
+				basic : 0,
+				hra : 0,
+				da : 0,
+				tax : 0,
+				salary : 0
+			}
+
+			this.getData = function(){
+				return JSON.parse(JSON.stringify(data));
+			}
+			
+			this.get = function(attrName){
+				return data[attrName];
+			};
+			this.set = function(attrName, value){
+				if (data[attrName] === value) return;
+				data[attrName] = value;
+				//trigger change notification for attrName
+				triggerChange(attrName);
+				triggerChange('all');
+				
+			}
+
+			function triggerChange(attrName){
+				var listenerFns = changeHandlers[attrName];
+				listenerFns.forEach(function(listenerFn){
+					if (typeof listenerFn === 'function')
+						listenerFn();
+				})
+			}
+			
+			var changeHandlers = {
+				basic : [],
+				hra : [],
+				da : [],
+				tax : [],
+				salary : [],
+				all : []
+			};
+
+			this.onChange = function(attrName, listenerFn){
+				changeHandlers[attrName].push(listenerFn);
+			}
+		}
+		SalaryCalculator.prototype.calculate = function(){
+			console.log('triggering calculate');
+			var gross = this.get('basic') + this.get('hra') + this.get('da');
+			var net = gross * ((100-this.get('tax'))/100);
+			this.set('salary', net);
+			
+		}
+
+		var SalaryCalculatorView = React.createClass({
+			triggerCalculate:function(){
+				
+				this.props.calculator.calculate();
+			},
+			updateBasic : function(evt){
+				this.props.calculator.set('basic', evt.target.value.toInt());
+			},
+			updateHra : function(evt){
+				this.props.calculator.set('hra', evt.target.value.toInt());
+			},
+			updateDa : function(evt){
+				this.props.calculator.set('da', evt.target.value.toInt());
+			},
+			updateTax : function(evt){
+				this.props.calculator.set('tax', evt.target.value.toInt());
+			},
+			render : function(){
+				var calculatorData = this.props.calculator.getData();
+				return (
+					<section className="content" id="content-1">
+						<div className="field">
+							<label htmlFor="">Basic :</label>
+							<input type="text" name="" ref="txtBasic" defaultValue={calculatorData.basic} onChange={this.updateBasic}/>
+						</div>
+						<div className="field">
+							<label htmlFor="">HRA :</label>
+							<input type="text" name="" ref="txtHra" defaultValue={calculatorData.hra} onChange={this.updateHra}/>
+						</div>
+						<div className="field">
+							<label htmlFor="">DA :</label>
+							<input type="text" name="" ref="txtDa" defaultValue={calculatorData.da} onChange={this.updateDa}/>
+						</div>
+						<div className="field">
+							<label htmlFor="">Tax :</label>
+							<input type="range" name="" ref="rangeTax" min="0" max="30" defaultValue={calculatorData.tax} onChange={this.updateTax}/>
+							<span id="spanTax">{calculatorData.tax}</span>
+						</div>
+						<div className="field">
+							<input type="button" value="Calculate" id="btnCalculate" onClick={this.triggerCalculate}/>
+						</div>
+						<div className="field">
+							<div id="divResult">{calculatorData.salary}</div>
+						</div>
+			</section>
+				)
+			}
+		})
+		$(document).ready(function(){
+			window.calculator = new SalaryCalculator();
+			calculator.set("basic", 20000);
+			calculator.set("hra", 3000);
+			calculator.set("da", 2000);
+			calculator.set("tax", 10);
+
+			function renderView(){
+				ReactDOM.render(<SalaryCalculatorView calculator={calculator}></SalaryCalculatorView>, $("#content")[0]);
+			}
+			calculator.onChange("all", renderView);
+			renderView();
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<div id="content"></div>
+</body>
+</html>
