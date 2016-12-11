@@ -38,9 +38,9 @@
 	<script type="text/babel">
 		function BugsCollection(){
 			var bugs = [
-				'Server communication failure',
-				'User actions not recognized',
-				'Application is not responsive'
+				{id : 1, name : 'Server communication failure', isClosed : false},
+				{id : 2, name : 'User actions not recognized', isClosed : true},
+				{id : 3, name : 'Application is not responsive', isClosed : false},
 			];
 			this.onChange = null;
 			var self = this;
@@ -48,8 +48,15 @@
 				if (typeof self.onChange === 'function')
 					self.onChange();
 			}
-			this.add = function(bug){
-				bugs.push(bug);
+			this.add = function(bugName){
+				var newBug = {
+					id : bugs.reduce(function(result, bug){
+						return result > bug.id ? result : bug.id;
+					}, 0)+1,
+					name : bugName,
+					isClosed : false
+				};
+				bugs.push(newBug);
 				//trigger change notification
 				triggerChange();
 			};
@@ -60,10 +67,25 @@
 		}
 		var bugsCollection = new BugsCollection();
 		var BugTracker = React.createClass({
+
+			onAddClick : function(){
+
+				var bugName = this.refs.txtBugName.value;
+				this.props.bugs.add(bugName);
+			},
+
 			render : function(){
 				var bugsData = this.props.bugs.getData();
 				var bugItems = bugsData.map(function(bugData){
-					return <li><span className="bugname">{bugData}</span></li>
+					var bugContent = bugData.isClosed 
+						? <span className="bugname closed"> {bugData.name} </span> 
+						: <span className="bugname">{bugData.name} </span>;
+
+					return (
+						<li key={bugData.id}>
+							{bugContent}
+						</li>
+					)
 				});
 				return (
 					<div>
@@ -74,8 +96,8 @@
 						</section>
 						<section className="list">
 							<label htmlFor="">Bug :</label>
-							<input type="text" name="" id="" />
-							<input type="button" value="Add Bug" />
+							<input type="text" ref="txtBugName" />
+							<input type="button" value="Add Bug" onClick={this.onAddClick} />
 							<input type="button" value="Remove Closed" />
 							<ol>
 								{bugItems}
