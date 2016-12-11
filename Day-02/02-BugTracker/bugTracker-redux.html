@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		section{
+			margin-bottom: 10px;
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+			-webkit-padding-start: 0px;
+		}
+		li{
+			border : 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 5px;
+			border-radius: 5px;
+			margin-bottom: 10px;
+		}
+		.stats, .bugname{
+			font-size: 20pt;
+		}
+		.bugname{
+			cursor: pointer;
+		}
+		.closed{
+			color : red;
+			font-style: italic;
+			text-decoration: line-through;
+		}
+	</style>
+	<script src="browser.min.js"></script>
+	<script src="jquery.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script type="text/babel">
+		function Store(reducer){
+			this.onChange = null;
+			var self = this;
+
+			function triggerChange(){
+				if (typeof self.onChange === 'function')
+					self.onChange();
+			}
+			var currentState = reducer();
+
+			this.getState = function(){
+				return currentState;
+			}
+
+			this.dispatch = function(action){
+				var newState = reducer(currentState, action);
+				if (newState !== currentState){
+					currentState = newState;
+					triggerChange();
+				}
+			}
+		}
+
+		function bugsReducer(currentState = [], action){
+			if (!action) return currentState;
+
+			switch(action.type){
+				case 'ADD_BUG':
+					var newId = currentState.reduce(function(result, bug){
+						return result > bug.id ? result : bug.id;
+					}, 0) + 1;
+					var newBug = {
+						id : newId,
+						name : action.payload.bugname,
+						closed : false
+					};
+					return currentState.concat([newBug]);
+					break;
+				case 'TOGGLE_BUG':
+					var bugToToggle = action.payload.bug;
+					return currentState.map(function(bug){
+						if (bug.id === bugToToggle.id){
+							return {
+								id : bug.id,
+								name : bug.name,
+								isClosed : !bug.isClosed
+							}
+						}
+						return bug;
+					});
+					break;
+				case 'REMOVE_CLOSED' :
+					return currentState.filter(function(bug){
+						return !bug.isClosed;
+					});
+					break;
+				default:
+					return currentState;
+			}
+		}
+
+
+
+		var appStore = new Store(bugsReducer);
+
+		var BugStats = React.createClass({
+
+			render : function(){
+				var bugsData = this.props.bugs;
+				var closedBugsCount = bugsData.reduce(function(result, bug){
+					return bug.isClosed ? ++result : result;
+				}, 0)
+				return (
+					<section className="stats">
+						<span className="closed">{closedBugsCount}</span>
+						<span> / </span>
+						<span>{bugsData.length}</span>
+					</section>
+				);
+			}
+		});
+		var BugListItem = React.createClass({
+			onBugClick  : function(){
+				this.props.store.dispatch({
+					type : 'TOGGLE_BUG',
+					payload : {
+						bug : this.props.bug
+					}
+				});
+			},
+			render : function(){
+				var bugData = this.props.bug;
+				var bugContent = bugData.isClosed 
+						? <span className="bugname closed" onClick={this.onBugClick}> {bugData.name} </span> 
+						: <span className="bugname" onClick={this.onBugClick}>{bugData.name} </span>;
+				return (
+
+						<li>
+							{bugContent}
+						</li>
+					)
+			}
+		})
+		var BugTracker = React.createClass({
+
+			onAddClick : function(){
+
+				var bugName = this.refs.txtBugName.value;
+				this.props.store.dispatch({type : 'ADD_BUG', payload : {bugname : bugName}});
+			},
+
+			onRemoveClosedClick : function(){
+				this.props.store.dispatch({
+					type : 'REMOVE_CLOSED'
+				})
+			},
+
+			render : function(){
+				var bugsData = this.props.store.getState();
+				var store = this.props.store;
+				var bugItems = bugsData.map(function(bugData){
+					return <BugListItem key={bugData.id} bug={bugData} store={store}></BugListItem>
+				});
+
+				return (
+					<div>
+						<BugStats bugs={bugsData}></BugStats>
+						<section className="list">
+							<label htmlFor="">Bug :</label>
+							<input type="text" ref="txtBugName" />
+							<input type="button" value="Add Bug" onClick={this.onAddClick} />
+							<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick}/>
+							<ol>
+								{bugItems}
+							</ol>
+						</section>
+					</div>
+				);
+			}
+		})
+
+		function render(){
+			ReactDOM.render(<BugTracker store={appStore}></BugTracker>, document.getElementById("content"))
+		}
+		appStore.onChange = render;
+		$(render);
+
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="content"></div>
+</body>
+</html>
