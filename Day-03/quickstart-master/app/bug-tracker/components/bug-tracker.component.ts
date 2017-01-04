@@ -5,18 +5,14 @@ import { IBug } from '../models/IBug';
     template : `
         <h2>Bug Tracker</h2>
         <hr/>
-        <section class="stats">
-            <span class="closed">2</span>
-            <span> / </span>
-            <span>{{bugs.length}}</span>
-        </section>
+        <bug-stats [data]="bugs"></bug-stats>
         <section class="list">
             <label for="">Bug :</label>
             <input type="text" #txtBugName>
             <input type="button" value="Add Bug" (click)="addNewBug(txtBugName.value)">
             <input type="button" value="Remove Closed" (click)="removeClosed()">
             <ol>
-                <li [*ngFor]="let bug of bugs">
+                <li *ngFor="let bug of bugs">
                     <span class="bugname" (click)="toggle(bug)" 
                         [ngClass]="{closed : bug.isClosed}"
                     >{{bug.name}}</span>
