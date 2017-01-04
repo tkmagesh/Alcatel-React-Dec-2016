@@ -4,7 +4,7 @@ import { IBug } from '../models/IBug';
 @Component({
     template : `
          <section class="stats">
-            <span class="closed">{{getClosedCount()}}</span>
+            <span class="closed">{{ data | closedCount}}</span>
             <span> / </span>
             <span>{{data.length}}</span>
         </section>
@@ -15,7 +15,5 @@ export class BugStatsComponent{
     @Input()
     data : Array<IBug> = new Array<IBug>();
 
-    getClosedCount(){
-        return this.data.reduce( (result, bug) => bug.isClosed ? ++ result : result, 0);
-    }
+   
 }

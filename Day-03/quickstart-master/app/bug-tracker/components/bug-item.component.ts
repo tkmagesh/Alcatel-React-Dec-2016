@@ -6,7 +6,7 @@ import { IBug } from '../models/IBug';
        <li>
             <span class="bugname" (click)="spanClick()" 
                 [ngClass]="{closed : data.isClosed}"
-            >{{data.name}}</span>
+            >{{data.name | trimText }}</span>
         </li>
     `,
     selector : 'bug-item'

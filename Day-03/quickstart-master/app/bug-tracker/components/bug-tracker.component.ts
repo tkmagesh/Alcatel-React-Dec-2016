@@ -22,14 +22,21 @@ export class BugTrackerComponent{
     bugs : Array<IBug> = new Array<IBug>()
 
     addNewBug(bugName:string){
-        this.bugs.push({
-            name : bugName,
-            isClosed : false,
-        })
+        var newBug = { name : bugName, isClosed : false};
+        this.bugs = this.bugs.concat([newBug]);
     }
 
     toggle (bug : IBug){
-        bug.isClosed = !bug.isClosed;
+        this.bugs = this.bugs.map(b => {
+            if (b === bug){
+                return {
+                    name : b.name,
+                    isClosed : !b.isClosed
+                }
+            } else {
+                return b;
+            }
+        })
     }
 
     removeClosed(){
