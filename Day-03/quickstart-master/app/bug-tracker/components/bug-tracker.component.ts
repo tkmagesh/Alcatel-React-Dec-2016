@@ -12,12 +12,7 @@ import { IBug } from '../models/IBug';
             <input type="button" value="Add Bug" (click)="addNewBug(txtBugName.value)">
             <input type="button" value="Remove Closed" (click)="removeClosed()">
             <ol>
-                <li *ngFor="let bug of bugs">
-                    <span class="bugname" (click)="toggle(bug)" 
-                        [ngClass]="{closed : bug.isClosed}"
-                    >{{bug.name}}</span>
-                </li>
-               
+                <bug-item *ngFor="let bug of bugs" [data]="bug" (bugClick)="toggle($event)"></bug-item>
             </ol>
         </section>
     `,

@@ -4,9 +4,11 @@ import { CommonModule } from '@angular/common';
 
 import { BugTrackerComponent} from './components/bug-tracker.component';
 import { BugStatsComponent } from './components/bug-stats.component';
+import { BugItemComponent } from './components/bug-item.component';
+
 @NgModule({
     imports : [FormsModule, CommonModule],
-    declarations : [BugTrackerComponent, BugStatsComponent],
+    declarations : [BugTrackerComponent, BugStatsComponent, BugItemComponent],
     providers : [],
     exports : [BugTrackerComponent]
 })
