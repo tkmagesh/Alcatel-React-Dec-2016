@@ -9,8 +9,9 @@ import { SalaryCalculatorComponent } from './salary-calculator/salary-calculator
 
 import { SalaryCalculator } from './salary-calculator/SalaryCalculator.model';
 
+import { BugTrackerModule } from './bug-tracker/bug-tracker.module';
 @NgModule({
-  imports:      [ BrowserModule, FormsModule ],
+  imports:      [ BrowserModule, FormsModule, BugTrackerModule ],
   declarations: [ AppComponent, GreeterComponent, MessageComponent, SalaryCalculatorComponent ],
   bootstrap:    [ AppComponent ],
   providers :   [ SalaryCalculator]
