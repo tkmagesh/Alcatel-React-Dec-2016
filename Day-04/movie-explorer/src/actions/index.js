@@ -13,3 +13,10 @@ export function Add_Movie_Action(name, description){
         }
     }
 }
+
+export function Delete_Movie_Action(movie){
+    return {
+        type : 'DELETE_MOVIE',
+        payload : movie
+    }
+}

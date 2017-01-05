@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import {Select_Movie_Action} from '../actions';
+import {Select_Movie_Action, Delete_Movie_Action} from '../actions';
+import DeleteMovie from './DeleteMovie';
 
 class Movies extends Component {
  
@@ -10,7 +11,10 @@ class Movies extends Component {
         (
           <li 
           onClick={() => this.props.selectMovie(movie)} 
-          key={movie.name}>{movie.name}</li>)
+          key={movie.name}>
+            <span>{movie.name}</span>
+             <DeleteMovie movie={movie} deleteMovie={this.props.deleteMovie}></DeleteMovie>
+          </li>)
         )
     return (
       <div>
@@ -24,7 +28,8 @@ class Movies extends Component {
 
 function mapDispatchToProps(dispatch){
   return bindActionCreators({
-  selectMovie : Select_Movie_Action
+    selectMovie : Select_Movie_Action,
+    deleteMovie : Delete_Movie_Action
   }, dispatch)
 }
 
