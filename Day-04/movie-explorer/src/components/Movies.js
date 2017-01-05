@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import SelectMovieAction from '../actions/select_movie_action';
+import {Select_Movie_Action} from '../actions';
 
 class Movies extends Component {
  
@@ -24,7 +24,7 @@ class Movies extends Component {
 
 function mapDispatchToProps(dispatch){
   return bindActionCreators({
-    selectMovie : SelectMovieAction
+  selectMovie : Select_Movie_Action
   }, dispatch)
 }
 
